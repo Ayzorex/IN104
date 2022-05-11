@@ -125,7 +125,7 @@ bool is_compatible(char* word_ref, char* word_test, char* config, int N)
             if (!stop)
             {
                 free(marquage);
-                return(stop);
+                return(false);
             }
         }
     }
@@ -353,7 +353,7 @@ void play_alone(unsigned int size_dico, int N, char* fname)
     char ** new_word_array=new_word_array_and_size->array;
     unsigned int new_size=new_word_array_and_size->size;
     //printf_array(word_array,new_size);
-    while (strcmp(config_answer,"22222")!=0)
+    while (new_size!=1)
     {
         
         best_word=get_best_word(new_word_array,config_array, N, new_size);
@@ -393,9 +393,9 @@ void free_tab_char(char** tab,unsigned int size_tab)
 int main(int argc, char* argv[])
 {
     srand(time(0));
-    unsigned int size_dico = 7645;
+    unsigned int size_dico = 135;
     unsigned int N = 5;
-    char* fname = "dico_5.txt";
+    char* fname = "dico_test.txt";
     play_alone(size_dico,N,fname);
     return(0);
 }
