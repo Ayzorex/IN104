@@ -5,39 +5,9 @@
 #include <math.h>
 
 #include "tools.h"
-#include "dicoreduit.h"
 #include "load_file.h"
-#include "chain.h" 
 
 
-/*
-Cette fontion ouvre le fichier et renvois le tableau de mot associé
-*/
-char **load_file (char *fname, unsigned int size)
-{
-    char buffer[32];
-    char **words_array = malloc(sizeof(char*)*size);
-    //printf("all good\n");
-
-    FILE *f ;
-    f = fopen (fname, "rb") ;
-    if (f== NULL) return (NULL) ;
-
-    printf("%d \n",size);
-    for(int i=0;i<size;i++) 
-    {
-        fscanf (f, "%s", buffer) ;
-        words_array[i] = malloc(sizeof(buffer));
-        strcpy(words_array[i],buffer);
-        //printf("%s\n",words_array[i]);
-    }
-    fclose(f);
-    return(words_array);
-}
-
-/*
-Renvoie la liste des char correspondant aux config possibles et prend en arguments la taille du mot
-*/
 char** get_config_array(int N)
 {
     int n = pow(3,N);
@@ -71,9 +41,7 @@ char** get_config_array(int N)
 }
 
 
-/*
-Revoie true si le mot est compatible avec la config et false sinon
-*/
+
 bool is_compatible(char* word_ref, char* word_test, char* config, int N)
 {
     bool stop=false;
@@ -140,9 +108,7 @@ bool is_compatible(char* word_ref, char* word_test, char* config, int N)
     return(true);
 }
 
-/*
-Renvoie le nombre de mot du dico compatible avec word_ref et la config choisie
-*/
+
 int get_number_compatible(char* config,char* word_ref,unsigned int size_curr_dico, char** word_array,char* marquage_word_ref, int N)
 {
     int count = 0;
@@ -166,9 +132,6 @@ int get_number_compatible(char* config,char* word_ref,unsigned int size_curr_dic
     return(count);
 }
 
-/*
-Renvoie l'entropie de word_ref
-*/
 double get_entropy(char* word_ref, char** word_array, unsigned int size_curr_dico, char** config_array, int N)
 {
     char* marquage_word_ref = calloc(size_curr_dico,sizeof(char));
@@ -198,16 +161,15 @@ double get_entropy(char* word_ref, char** word_array, unsigned int size_curr_dic
     free(marquage_word_ref);
     return(entropy);
 }
-/*
-Renvoie le mot avec la plus grande entropie
-*/
+
+
 char* get_best_word(char** word_array, char** config_array, int N, unsigned int size_curr_dico)
 {
     char* best_word = word_array[0];
     double best_entropy = get_entropy(best_word,word_array,size_curr_dico,config_array,N);
     for(int i=0;i<size_curr_dico;i++)
     {
-        if(i%200 == 0)
+        if(i%200 == 0) //Pour vérifier que le programme tourne on a mis un système de pourcentage d'avancé (ne marque que si il reste plus de 200 mots dans la liste)
         {
             double ii = i;
             double nn = size_curr_dico;
@@ -223,9 +185,8 @@ char* get_best_word(char** word_array, char** config_array, int N, unsigned int 
     }
     return(best_word);
 }
-/*
-Permet de créer le nouveau tableau de mot sur l'ancien en prenant une config et un mot ref
-*/
+
+
 struct Array_and_size* create_new_word_array(char* word_ref, char* config, char** word_array, unsigned int size_dico,int N)
 {
     struct Array_and_size* new_array_and_size=malloc(sizeof(struct Array_and_size));
@@ -243,11 +204,7 @@ struct Array_and_size* create_new_word_array(char* word_ref, char* config, char*
     return(new_array_and_size);
 }
 
-
-/*
-Fonction dans laquelle le jeu tourne
-*/
-void resolve(unsigned int size_dico, char** word_array, char** config_array, int N)
+int resolve(unsigned int size_dico, char** word_array, char** config_array, int N)
 {
     char config_answer[32];
     int turn=0;
@@ -259,7 +216,7 @@ void resolve(unsigned int size_dico, char** word_array, char** config_array, int
     struct Array_and_size *new_word_array_and_size = create_new_word_array(best_word,config_answer,word_array,size_dico,N);
     char ** new_word_array=new_word_array_and_size->array;
     unsigned int new_size=new_word_array_and_size->size;
-    printf_array(word_array,new_size);
+    //printf_array(word_array,new_size);
     while (strcmp(config_answer,"22222")!=0)
     {
         
@@ -268,60 +225,12 @@ void resolve(unsigned int size_dico, char** word_array, char** config_array, int
         printf("entrez la config réponse : ");
         scanf("%s",config_answer);
         printf("\n");
-        printf_array(word_array,new_size);
+        //printf_array(word_array,new_size);
         new_word_array_and_size = create_new_word_array(best_word,config_answer,word_array,new_size,N);
         new_word_array=new_word_array_and_size->array;
         new_size=new_word_array_and_size->size;
         turn++;
     }
     printf("mot trouvé en %d coups\n",turn);
-}
-
-
-
-
-int main(int argc, char* argv[])
-{
-    
-    // char* word_size = "5";
-    // unsigned int N = atoi(word_size);
-    /*
-    struct Array_and_size* array_and_size = malloc(sizeof(struct Array_and_size));
-    printf("ok");
-    array_and_size = get_word_array("dico.txt");
-    char** word_array = array_and_size->array;
-    unsigned int size = array_and_size->size;
-    printf("%s\n",word_array[0]);
-    printf("%d\n",size);
-    */
-
-    /*
-    unsigned int size_dico = build_dico(word_size);
-    printf("%d\n",size_dico);
-    printf("%d\n",N);
-    
-    char fname[] = "dico_";
-    strcat(fname,word_size);
-    //strcat(fname,".txt");
-    printf("%s\n",fname);
-    printf("on a éxécuté toutes les taches du programme !\n");
-    */
-    // unsigned int size_dico = 135;
-    // char** word_array = load_file("dico_test.txt",size_dico);
-    // unsigned int N = 5;
-    // char** config_array = get_config_array(N);
-    // resolve(size_dico,word_array,config_array,N);
-    //bool t = is_compatible("ALALA","ALALA","02000");
-    //printf("%d\n",t);
-    //double entropie = get_entropy("MANGERA",word_array,size_dico,config_array,N);
-    //int number = get_number_compatible("11111","ALALA",size_dico,word_array);
-    //printf("%f \n",entropie);
-    //free_tab_char(word_array,size_dico);
-    //free_tab_char(config_array,pow(3,N));
-
-    struct Array_and_size* array_and_size = get_word_array("dico_5.txt");
-    char** word_array = array_and_size->array;
-    unsigned int size = array_and_size->size;
-    printf_array(word_array,size);
-    return(0);
+    return(turn);
 }

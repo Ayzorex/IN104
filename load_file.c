@@ -6,7 +6,6 @@
 #include "load_file.h"
 #include "tools.h"
 
-
 void free_chain(struct Chain_link* link)
 {
     struct Chain_link* tmp;
@@ -18,9 +17,30 @@ void free_chain(struct Chain_link* link)
     }  
 }
 
+char **load_file_naif (char *fname, unsigned int size)
+{
+    char buffer[32];
+    char **words_array = malloc(sizeof(char*)*size);
+    //printf("all good\n");
+
+    FILE *f ;
+    f = fopen (fname, "rb") ;
+    if (f== NULL) return (NULL) ;
+
+    printf("%d \n",size);
+    for(int i=0;i<size;i++) 
+    {
+        fscanf (f, "%s", buffer) ;
+        words_array[i] = malloc(sizeof(buffer));
+        strcpy(words_array[i],buffer);
+        //printf("%s\n",words_array[i]);
+    }
+    fclose(f);
+    return(words_array);
+}
 
 
-struct Array_and_size* get_word_array(char* fname)
+struct Array_and_size* get_word_array(char* fname, unsigned int N)
 {
     unsigned int count_words = 0 ;
     struct Chain_link *link = NULL ;
@@ -30,14 +50,17 @@ struct Array_and_size* get_word_array(char* fname)
     fscanf (in_hd, "%s", buffer) ;
     while (! feof (in_hd)) 
     {
-        char *word_cpy ;
-        struct Chain_link *new_cell = malloc (sizeof (struct Chain_link)) ;
-        word_cpy = malloc ((1 + strlen (buffer)) * sizeof (char)) ;
-        strcpy (word_cpy, buffer) ;
-        new_cell->word = word_cpy ;
-        new_cell->next = link ;
-        link = new_cell ;
-        count_words++ ;
+        if(strlen(buffer)==N)
+        {
+            char *word_cpy ;
+            struct Chain_link *new_cell = malloc (sizeof (struct Chain_link)) ;
+            word_cpy = malloc ((1 + strlen (buffer)) * sizeof (char)) ;
+            strcpy (word_cpy, buffer) ;
+            new_cell->word = word_cpy ;
+            new_cell->next = link ;
+            link = new_cell ;
+            count_words++ ;
+        }
         fscanf (in_hd, "%s", buffer) ;
     }
     fclose (in_hd) ;

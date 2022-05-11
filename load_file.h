@@ -15,9 +15,14 @@ Permet de free une chaine
 void free_chain(struct Chain_link* link);
 
 /*
-Prend en argument le nom d'un fichier et renvoit le tableau de mot correspondant
-ansi que la taille de ce tableau
+Ouvre le fichier SANS AVOIR SA TAILLE, récupère les mots de taille N à travers une chaine puis crée un char** pour stocker les mots
+Renvois un struct avec le tableau et sa taille
 */
-struct Array_and_size* get_word_array(char* fname);
+struct Array_and_size* get_word_array(char* fname, unsigned int N);
+
+/*
+Cette fontion ouvre le fichier et renvois le tableau de mot associé
+*/
+char **load_file_naif (char *fname, unsigned int size);
 
 #endif

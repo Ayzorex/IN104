@@ -3,34 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include "load_file.h"
 
-/*
-Cette fontion ouvre le fichier et renvois le tableau de mot associé
-*/
-char **load_file (char *fname, unsigned int size)
-{
-    char buffer[32];
-    char **words_array = malloc(sizeof(char*)*size);
-    FILE *f ;
 
-    f = fopen (fname, "rb") ;
-    if (f== NULL) return (NULL) ;
-
-    fscanf (f, "%s", buffer) ;
-    int indice=0;
-    while (! feof (f)) 
-    {
-        words_array[indice] = malloc(sizeof(buffer));
-        strcpy(words_array[indice],buffer);
-        fscanf (f, "%s", buffer) ;
-        indice++;
-    }
-    return(words_array);
-}
-
-/* 
-Cette fonction prend en argument le tableau du dico et sa taille et va renvoyer un mot au hasard du dico
-*/
 char* word_select(char** dico, int size_dico, char* secret_word)
 {
     int id = rand()%size_dico;
@@ -77,23 +52,23 @@ bool recherche_dichoto(char **tab, char *word, unsigned int size)
 /*
 Cette fonction prend en argument le dico et sa taille, demande à l'utilisateur un mot et vérifie si il est valide et le renvois une fois le mot rentré valide
 */
-void get_word(char** dico,unsigned int size_dico, char* current_word)
+void get_word(char** dico,unsigned int size_dico, char* current_word,unsigned int N)
 {
     bool stop = false;
     char buffer[16];
     while (! stop)
     {   
-        printf("entrez un mot de 5 lettres svp\n");
+        printf("entrez un mot de %d lettres svp\n",N);
         scanf(" %s",buffer);
-        if (strlen(buffer)!=5)
+        if (strlen(buffer)!=N)
         {
-            printf("le mot ne fait pas 5 lettres\n");
+            printf("le mot ne fait pas %d lettres\n",N);
         }
         if (! recherche_dichoto(dico,buffer,size_dico))
         {
             printf("le mot choisi n'est pas dans le dictionnaire\n");
         }
-        if (strlen(buffer)==5 && recherche_dichoto(dico,buffer,size_dico))
+        if (strlen(buffer)==N && recherche_dichoto(dico,buffer,size_dico))
         {
             stop = true;
         }
@@ -102,13 +77,10 @@ void get_word(char** dico,unsigned int size_dico, char* current_word)
 }
 
 
-/*
-Renvois le nombre d'occurence d'un char dans un char*
-*/
-int occurences (char* word, char letter)
+int occurences (char* word, char letter,unsigned int N)
 {
     int occurence=0;
-    for (int i=0; i<5; i++)
+    for (int i=0; i<N; i++)
     {
         if (word[i]==letter)
         {
@@ -118,22 +90,13 @@ int occurences (char* word, char letter)
     return(occurence);
 }
 
-void printf_list(char* word)
-{
-    for(int i=0;i<strlen(word)+1;i++)
-    {
-        printf("%c",word[i]);
-    }
-    printf("\n");
-}
-
-void  analyse(char* current_word, char* secret_word,int N)
+char*  analyse(char* current_word, char* secret_word,unsigned int N)
 {
     bool presence=false;
-    char* list_presents = calloc(5,sizeof(char));
+    char* list_presents = calloc(N,sizeof(char));
     int cursor=0;
-    char* config=malloc(N*sizeof(char));
-    for (int i=0; i<5; i++)
+    char* config=malloc((N+1)*sizeof(char));
+    for (int i=0; i<N; i++)
     {
         if (current_word[i]==secret_word[i])
         {
@@ -144,11 +107,11 @@ void  analyse(char* current_word, char* secret_word,int N)
         else
         {
             presence=false;
-            for (int j=0; j<5; j++)
+            for (int j=0; j<N; j++)
             {
                 if ( j!=i && current_word[i]==secret_word[j])
                 {
-                    if (occurences(secret_word,current_word[i])>occurences(list_presents,current_word[i]))
+                    if (occurences(secret_word,current_word[i],N)>occurences(list_presents,current_word[i],N))
                     {
                         presence=true;
                         list_presents[cursor]=current_word[i];
@@ -166,24 +129,26 @@ void  analyse(char* current_word, char* secret_word,int N)
         }
         
     }
-    printf("%s\n",config);
+    config[N]='\0';
+    //printf("%s\n",config);
     //printf_list(list_presents);
     free(list_presents);
+    return(config);
 }
 
 
 
-int main(int argc, char* argv[])
+void play_wordle(unsigned int N,char* fname)
 { 
-    int N= 5;
     srand(time(0));
-    unsigned int size_dico = 7645 ;
-    char** dico = load_file("dico_5.txt",size_dico);
+    struct Array_and_size* array_and_size = get_word_array(fname,N);
+    unsigned int size_dico = array_and_size->size;
+    char** dico = array_and_size->array;
+    
     char word[16];
     char* secret_word = word_select(dico,size_dico,word);
-    printf("%s\n",secret_word);
     
-
+    //printf("%s\n",secret_word);
     //fin de l'initialisation du jeu, début de la boucle
     int turn = 1;
     bool game = true;
@@ -191,7 +156,7 @@ int main(int argc, char* argv[])
     while (game && turn<=6)
     {
         //on entre un mot et on vérifie qu'il est valide
-        get_word(dico,size_dico,current_word);
+        get_word(dico,size_dico,current_word,N);
         if (strcmp(current_word,secret_word)==0)
         {
             game = false;
@@ -207,6 +172,4 @@ int main(int argc, char* argv[])
     {
         printf("Vous avez perdu! Le mot était %s\n",secret_word);
     }
-    
-    return(0);
 }
