@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
+
+#include "tools.h"
 #include "dicoreduit.h"
 #include "load_file.h"
 #include "chain.h" 
@@ -68,16 +70,6 @@ char** get_config_array(int N)
     return(config_array);
 }
 
-/*
-Afficher un double tableau d'entier
-*/
-void super_print(char** tab, int N)
-{
-    for(int i=0;i<pow(3,N);i++)
-    {
-        printf("%s\n",tab[i]);
-    }
-}
 
 /*
 Revoie true si le mot est compatible avec la config et false sinon
@@ -251,19 +243,11 @@ struct Array_and_size* create_new_word_array(char* word_ref, char* config, char*
     return(new_array_and_size);
 }
 
-void printf_array(char** array,unsigned int size)
-{
-    for(int i=0;i<size;i++)
-    {
-        printf("%s\n",array[i]);
-    }
-
-}
 
 /*
 Fonction dans laquelle le jeu tourne
 */
-void play(unsigned int size_dico, char** word_array, char** config_array, int N)
+void resolve(unsigned int size_dico, char** word_array, char** config_array, int N)
 {
     char config_answer[32];
     int turn=0;
@@ -295,19 +279,6 @@ void play(unsigned int size_dico, char** word_array, char** config_array, int N)
 
 
 
-/*
-free un tableau de char*
-*/
-void free_tab_char(char** tab,unsigned int size_tab)
-{
-    for(int i=0;i<size_tab;i++)
-    {
-        //printf("%d\n",i);
-        free(tab[i]);
-    }
-    free(tab);
-}
-
 
 int main(int argc, char* argv[])
 {
@@ -335,11 +306,11 @@ int main(int argc, char* argv[])
     printf("%s\n",fname);
     printf("on a éxécuté toutes les taches du programme !\n");
     */
-    unsigned int size_dico = 135;
-    char** word_array = load_file("dico_test.txt",size_dico);
-    unsigned int N = 5;
-    char** config_array = get_config_array(N);
-    play(size_dico,word_array,config_array,N);
+    // unsigned int size_dico = 135;
+    // char** word_array = load_file("dico_test.txt",size_dico);
+    // unsigned int N = 5;
+    // char** config_array = get_config_array(N);
+    // resolve(size_dico,word_array,config_array,N);
     //bool t = is_compatible("ALALA","ALALA","02000");
     //printf("%d\n",t);
     //double entropie = get_entropy("MANGERA",word_array,size_dico,config_array,N);
@@ -348,5 +319,9 @@ int main(int argc, char* argv[])
     //free_tab_char(word_array,size_dico);
     //free_tab_char(config_array,pow(3,N));
 
+    struct Array_and_size* array_and_size = get_word_array("dico_5.txt");
+    char** word_array = array_and_size->array;
+    unsigned int size = array_and_size->size;
+    printf_array(word_array,size);
     return(0);
 }

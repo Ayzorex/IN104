@@ -12,7 +12,7 @@ struct Array_and_size
 /*
 Permet de free une chaine
 */
-void free_chain(struct Chain_head chain_head);
+void free_chain(struct Chain_link* link);
 
 /*
 Prend en argument le nom d'un fichier et renvoit le tableau de mot correspondant

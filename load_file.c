@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "chain.h"
 #include "load_file.h"
+#include "tools.h"
 
-void free_chain(struct Chain_head chain_head)
+
+void free_chain(struct Chain_link* link)
 {
-    struct Chain_link* tmp = chain_head.chain_first;
-    struct Chain_link* tmp2;
-    while (tmp != NULL)
+    struct Chain_link* tmp;
+    while (link != NULL)
     {
-        tmp = tmp2->next;
-        free(tmp);
-        tmp2 = tmp;
+        tmp = link->next;
+        free(link);
+        link = tmp;
     }  
 }
 
@@ -20,45 +22,37 @@ void free_chain(struct Chain_head chain_head)
 
 struct Array_and_size* get_word_array(char* fname)
 {
-    printf("on rentre dans get_word_array");
-    FILE* file;
-    file = fopen(fname,"rb");
-    if (file == NULL) return(NULL) ;
-
-    char buffer[32];
-    fscanf(file, " %s",buffer);
-    printf("fichier ouvert");
-    struct Chain_head chain_head = {1,NULL,NULL};
-    struct Chain_link* tmp = malloc(sizeof(struct Chain_link));
-    chain_head.chain_last = tmp;
-    chain_head.chain_first = tmp;
-    strcpy(tmp->word,buffer);
-
-    while (feof(file))
+    unsigned int count_words = 0 ;
+    struct Chain_link *link = NULL ;
+    char buffer[256] ;
+    FILE *in_hd ;
+    in_hd = fopen (fname, "rb") ;
+    fscanf (in_hd, "%s", buffer) ;
+    while (! feof (in_hd)) 
     {
-        fscanf(file, " %s",buffer);
-        struct Chain_link* tmp = malloc(sizeof(struct Chain_link));
-        chain_head.size++;
-        chain_head.chain_last->next = tmp;
-        chain_head.chain_last = tmp;
-        strcpy(tmp->word,buffer);
+        char *word_cpy ;
+        struct Chain_link *new_cell = malloc (sizeof (struct Chain_link)) ;
+        word_cpy = malloc ((1 + strlen (buffer)) * sizeof (char)) ;
+        strcpy (word_cpy, buffer) ;
+        new_cell->word = word_cpy ;
+        new_cell->next = link ;
+        link = new_cell ;
+        count_words++ ;
+        fscanf (in_hd, "%s", buffer) ;
     }
-    fclose(file);
-    
+    fclose (in_hd) ;
+    char ** word_array = malloc (count_words * sizeof (char*)) ;
+    unsigned int size = count_words ;
+    struct Chain_link * tmp1 = link;
+    for(int i=0;i<size;i++)
+    {
+        struct Chain_link * tmp2 = tmp1->next;
+        word_array[size-1-i]=tmp1->word;
+        tmp1 = tmp2;
+    }
     struct Array_and_size* array_and_size = malloc(sizeof(struct Array_and_size));
-    array_and_size->size = chain_head.size;
-    char** word_array = malloc(chain_head.size*sizeof(char*));
-    
-    tmp = chain_head.chain_first;
-    unsigned int cursor = 0;
-    while(tmp!=NULL)
-    {
-        word_array[cursor] = malloc(sizeof(tmp->word));
-        strcpy(word_array[cursor],tmp->word);
-        cursor++;
-        tmp = tmp->next;
-    }
     array_and_size->array = word_array;
-    free_chain(chain_head);
+    array_and_size->size = size;
+    free_chain(link);
     return(array_and_size);
 }
