@@ -1,18 +1,33 @@
 #include <stdio.h>
-
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
 #include "tools.h"
 #include "load_file.h"
 #include "resolve.h"
 #include "dicoreduit.h"
+#include "jeu_auto.h"
+#include "jeu_auto_naif.h"
 
 int main()
 {
+    srand(time(0));
+    int number_test = 1;
     char* fname = "dico.txt";
-    unsigned int N = 3;
-    struct Array_and_size* array_and_size = get_word_array(fname,N);
-    char** word_array = array_and_size->array;
-    unsigned int size = array_and_size->size;
-    char** config_array = get_config_array(N);
-    int turn = resolve(size,word_array,config_array,N);
-    printf("%d\n",turn);
+    unsigned int N = 5;
+    char* test ="210";
+    int list_turn[number_test];
+    int turn;
+    for(int i = 0;i<number_test;i++)
+    {
+        turn = play_alone(fname,N,test);
+        list_turn[i]=turn;
+    }
+    for(int i =0;i<number_test;i++)
+    {
+        printf("%d, ",list_turn[i]);
+    }
+    printf("\n");
+    return(0);
+    
 }

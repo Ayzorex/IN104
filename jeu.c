@@ -6,10 +6,12 @@
 #include "load_file.h"
 
 
-char* word_select(char** dico, int size_dico, char* secret_word)
+char* word_select(char** dico, int size_dico, unsigned int N)
 {
     int id = rand()%size_dico;
+    char* secret_word = malloc((N+1)*sizeof(char*));
     strcpy(secret_word,dico[id]);
+    secret_word[N]='\0';
     return(secret_word);
 }
 
@@ -145,8 +147,7 @@ void play_wordle(unsigned int N,char* fname)
     unsigned int size_dico = array_and_size->size;
     char** dico = array_and_size->array;
     
-    char word[16];
-    char* secret_word = word_select(dico,size_dico,word);
+    char* secret_word = word_select(dico,size_dico,N);
     
     //printf("%s\n",secret_word);
     //fin de l'initialisation du jeu, début de la boucle
