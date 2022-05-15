@@ -4,6 +4,6 @@
 /*
 Joue contre lui meme avec la résolution théorie de l'information
 */
-int play_alone(char* fname,unsigned int N,char* test);
+int play_alone(char* fname,unsigned int N);
 
 #endif

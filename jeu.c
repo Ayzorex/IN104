@@ -9,9 +9,10 @@
 char* word_select(char** dico, int size_dico, unsigned int N)
 {
     int id = rand()%size_dico;
+    //printf("%d\n",id);
     char* secret_word = malloc((N+1)*sizeof(char*));
     strcpy(secret_word,dico[id]);
-    secret_word[N]='\0';
+    //secret_word[N]='\0';
     return(secret_word);
 }
 

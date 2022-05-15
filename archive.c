@@ -118,3 +118,182 @@ bool is_compatible(char* word_ref, char* word_test, char* config)
     free(list_precense);
     return(true);
 }
+
+
+/*Teste uniquement les 2 (verts)*/
+
+bool is_compatible_verts(char* word_ref, char* word_test, char* config, int N)
+{
+
+    for(int i=0;i<N;i++)
+    {
+        if(config[i]=='2')
+        {
+            if(word_ref[i]!=word_test[i])
+            {
+                return(false);
+            }
+        }
+    }   
+    return(true);
+}
+
+
+
+
+/*Teste uniquement les 1 (jaune)*/
+
+bool is_compatible_jaune(char* word_ref, char* word_test, char* config, int N)
+{
+    bool stop=false;
+    char* marquage = calloc(N,sizeof(char));
+
+//On test les vert pour créer la liste marquage(2)
+    for(int i=0;i<N;i++)
+    {
+        if(config[i]=='2')
+        {
+            if(word_ref[i]==word_test[i])
+            {
+                marquage[i]='1';
+            }
+        }
+    }
+//On test les jaunes (1)
+    for(int i=0;i<N;i++)
+    {
+        stop=false; 
+        if (config[i]=='1')
+        {
+            if(word_test[i]==word_ref[i]) 
+            {
+                free(marquage);
+                return(false);
+            }
+            for(int j=0;j<N;j++)
+            {
+                if (word_ref[i]==word_test[j] && marquage[j]!='1')
+                {
+                    stop = true;
+                    marquage[j]='1';
+                }
+            }
+            if (!stop)
+            {
+                free(marquage);
+                return(stop);
+            }
+        }
+    }
+    free(marquage);
+    return(true);
+}
+
+/*Teste uniquement les 0 (gris)*/
+
+bool is_compatible_gris(char* word_ref, char* word_test, char* config, int N)
+{
+    char* marquage = calloc(N,sizeof(char));
+
+//On test les vert (2)
+    for(int i=0;i<N;i++)
+    {
+        if(config[i]=='2')
+        {
+            if(word_ref[i]==word_test[i])
+            {
+                marquage[i]='1';
+            }
+        }
+    }
+//On test les jaunes (1)
+    for(int i=0;i<N;i++)
+    {
+        if (config[i]=='1')
+        {
+            for(int j=0;j<N;j++)
+            {
+                if (word_ref[i]==word_test[j] && marquage[j]!='1')
+                {
+                    marquage[j]='1';
+                }
+            }
+        }
+    }
+//On test les gris (0)
+    for(int i=0;i<N;i++)
+    {
+        if(config[i]=='0')
+        {
+            for(int j=0;j<N;j++)
+            {
+                if(word_ref[i]==word_test[j] && marquage[j]!='1')
+                {
+                    free(marquage);
+                    return(false);
+                }
+            }
+        }
+    }
+    free(marquage);
+    return(true);
+}
+
+
+bool is_compatible(char* word_ref, char* word_test, char* config, int N, char* test)
+{
+    if (strcmp(test, "2")==0)
+    {
+        return is_compatible_verts(word_ref,word_test,config,N);
+    }
+    if (strcmp(test, "1")==0)
+    {
+        return is_compatible_jaune(word_ref,word_test,config,N);
+    }
+    if (strcmp(test, "0")==0)
+    {
+        return is_compatible_gris(word_ref,word_test,config,N);
+    }
+    if (strcmp(test, "21")==0)
+    {
+        if (is_compatible_verts(word_ref,word_test,config,N))
+        {
+            if (is_compatible_jaune(word_ref,word_test,config,N))
+            {
+                return true;
+            }
+        }else{
+            return false;
+        }
+    }
+    if (strcmp(test, "20")==0)
+    {
+        if (is_compatible_verts(word_ref,word_test,config,N)&&is_compatible_gris(word_ref,word_test,config,N))
+        {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    if (strcmp(test, "10")==0)
+    {
+        if (is_compatible_jaune(word_ref,word_test,config,N) && is_compatible_gris(word_ref,word_test,config,N))
+        {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    if (strcmp(test,"210")==0)
+    {
+        if (is_compatible_verts(word_ref,word_test,config,N) && is_compatible_jaune(word_ref,word_test,config,N) && is_compatible_gris(word_ref,word_test,config,N))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true;
+}
